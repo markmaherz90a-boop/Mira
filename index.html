@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد صور عيد ميلاد JS 🎂</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(15px);
+            margin-bottom: 2rem;
+        }
+
+        /* مشغل MP3 محسن */
+        .music-player {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.95);
+            padding: 20px 30px;
+            border-radius: 50px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 3px solid rgba(255,107,107,0.3);
+            min-width: 300px;
+        }
+
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .music-btn {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+            box-shadow: 0 8px 20px rgba(255,107,107,0.4);
+        }
+
+        .music-btn:hover:not(.playing) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(255,107,107,0.6);
+        }
+
+        .music-btn.playing {
+            background: linear-gradient(45deg, #666, #444);
+        }
+
+        .play-btn {
+            padding: 15px;
+            font-size: 1.3rem;
+            min-width: 50px;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.1s;
+        }
+
+        .time-display {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+            min-width: 50px;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255,107,107,0.4);
+            margin-bottom: 1rem;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255,107,107,0.6);
+        }
+
+        .card-preview {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+            text-align: center;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: #2c3e50;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-age {
+            font-size: 1.3rem;
+            color: #e74c3c;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-message {
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .download-section {
+            display: none;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px dashed #ddd;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        .balloons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .balloon {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .header h1 { font-size: 1.8rem; }
+            .music-player { 
+                bottom: 20px; 
+                padding: 15px 20px; 
+                gap: 10px; 
+                flex-wrap: wrap;
+                min-width: 280px;
+            }
+            .music-btn { font-size: 0.9rem; padding: 10px 15px; }
+            .container { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- مشغل MP3 محسن -->
+    <div class="music-player">
+        <audio id="birthdaySong" loop preload="auto">
+            <!-- أغنية عيد ميلاد ميرة - يمكنك تغيير الرابط -->
+            <source src="music.mp3" type="audio/mpeg">
+            <!-- أو استخدم ملف محلي: <source src="happy-birthday.mp3" type="audio/mpeg"> -->
+            المتصفح مش بيدعم الصوت!
+        </audio>
+        
+        <div class="music-controls">
+            <button class="music-btn play-btn" id="playBtn" onclick="toggleSong()" title="تشغيل/إيقاف">▶️</button>
+            
+            <div class="progress-container" id="progressContainer" onclick="setProgress(event)">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <span class="time-display" id="timeDisplay">0:00</span>
+            
+            <div class="volume-container">
+                <span>🔊</span>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="1" onchange="setVolume()">
+            </div>
+        </div>
+        
+        <button class="music-btn" onclick="toggleLoop()" id="loopBtn" title="تكرار">🔁</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎂 مولد بطاقة عيد ميلاد 🎉</h1>
+        </div>
+
+        <div class="input-group">
+            <label>الاسم</label>
+            <input type="text" id="nameInput" placeholder="ميرة" value="ميرة">
+        </div>
+
+        <div class="input-group">
+            <label>العمر</label>
+            <input type="number" id="ageInput" placeholder="13" value="13" min="1" max="150">
+        </div>
+
+        <div class="input-group">
+            <label>اللون</label>
+            <select id="colorInput">
+                <option value="pink">وردي 🌸</option>
+                <option value="blue">أزرق 🌊</option>
+                <option value="gold">ذهبي ✨</option>
+                <option value="green">أخضر 🌿</option>
+                <option value="purple">بنفسجي 💜</option>
+            </select>
+        </div>
+
+        <button class="generate-btn" onclick="generateCard()">✨ إنشاء البطاقة</button>
+
+        <div class="card-preview" id="cardPreview">
+            <div class="balloons" id="balloons"></div>
+            <div class="card-name" id="previewName">ميرة</div>
+            <div class="card-age" id="previewAge">🎈 13 سنة 🎈</div>
+            <div class="card-message" id="previewMessage">
+                كل سنة وأنتِ طيبة يا أحلى بنت في الدنيا! 🌟
+            </div>
+        </div>
+
+        <div class="download-section" id="downloadSection">
+            <button class="download-btn" onclick="downloadCard()">💾 تحميل الصورة</button>
+        </div>
+    </div>
+
+    <script>
+        // الألوان
+        const colors = {
+            pink: '#ff9a9e',
+            blue: '#a8edea',
+            gold: '#ffd700',
+            green: '#a8e6cf',
+            purple: '#667eea'
+        };
+
+        // مشغل MP3 محسن
+        let isPlaying = false;
+        let isLooping = true;
+        const song = document.getElementById('birthdaySong');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const loopBtn = document.getElementById('loopBtn');
+
+        // تشغيل/إيقاف
+        function toggleSong() {
+            if (isPlaying) {
+                song.pause();
+                playBtn.innerHTML = '▶️';
+                playBtn.title = 'تشغيل';
+                isPlaying = false;
+            } else {
+                song.play().catch(e => {
+                    console.log('خطأ في التشغيل:', e);
+                    alert('💡 اضغط على الصفحة الأول عشان الصوت يشتغل');
+                });
+                playBtn.innerHTML = '⏸️';
+                playBtn.title = 'إيقاف';
+                isPlaying = true;
+            }
+        }
+
+        // التحكم في الصوت
+        function setVolume() {
+            song.volume = volumeSlider.value;
+        }
+
+        // شريط التقدم
+        song.addEventListener('timeupdate', function() {
+            if (song.duration) {
+                const percentage = (song.currentTime / song.duration) * 100;
+                progressBar.style.width = percentage + '%';
+                
+                const currentMinutes = Math.floor(song.currentTime / 60);
+                const currentSeconds = Math.floor(song.currentTime % 60);
+                const durationMinutes = Math.floor(song.duration / 60);
+                const durationSeconds = Math.floor(song.duration % 60);
+                
+                timeDisplay.textContent = 
+                    `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')} / ` +
+                    `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+            }
+        });
+
+        // النقر على شريط التقدم
+        function setProgress(event) {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (event.clientX - rect.left) / rect.width;
+            song.currentTime = pos * song.duration;
+        }
+
+        // تكرار الأغنية
+        function toggleLoop() {
+            isLooping = !isLooping;
+            song.loop = isLooping;
+            loopBtn.style.background = isLooping ? 
+                'linear-gradient(45deg, #ff6b6b, #feca57)' : 
+                'linear-gradient(45deg, #95a5a6, #7f8c8d)';
+        }
+
+        // عند انتهاء الأغنية
+        song.addEventListener('ended', function() {
+            if (isLooping) {
+                song.currentTime = 0;
+                song.play();
+            } else {
+                isPlaying = false;
+                playBtn.innerHTML = '▶️';
+                playBtn.title = 'تشغيل';
+                progressBar.style.width = '0%';
+                timeDisplay.textContent = '0:00';
+            }
+        });
+
+        // إنشاء البطاقة
+        function generateCard() {
+            const name = document.getElementById('nameInput').value || 'مجهول';
+            const age = document.getElementById('ageInput').value || '?';
+            const color = document.getElementById('colorInput').value;
+
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewAge').textContent = `🎈 ${age} سنة 🎈`;
+            document.getElementById('previewMessage').textContent = 
+                `كل سنة وأنتِ طيبة يا ${name.split(' ')[0]}! 🌟`;
+
+            const preview = document.getElementById('cardPreview');
+            preview.style.background = `linear-gradient(135deg, ${colors[color]} 0%, ${colors[color]}dd 100%)`;
+
+            const balloons = document.getElementById('balloons');
+            balloons.innerHTML = '';
+            const balloonEmojis = ['🎈', '🎉', '🎊', '🎁', '✨'];
+            for (let i = 0; i < 5; i++) {
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.innerHTML = balloonEmojis[i];
+                balloon.style.left = `${10 + i * 18}%`;
+                balloon.style.top = `${10 + Math.sin(i) * 20}%`;
+                balloon.style.animationDelay = `${i * 0.3}s`;
+                balloons.appendChild(balloon);
+            }
+
+            document.getElementById('cardPreview').style.display = 'block';
+            document.getElementById('downloadSection').style.display = 'block';
+            document.getElementById('cardPreview').scrollIntoView({behavior: 'smooth'});
+        }
+
+        // تحميل الصورة
+        function downloadCard() {
+            html2canvas(document.getElementById('cardPreview'), {
+                backgroundColor: null,
+                scale: 3,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'eid-milad-mira.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(() => {
+                alert('جرب تاني أو افتح من كروم');
+            });
+        }
+
+        // Live preview
+        document.getElementById('nameInput').addEventListener('input', function() {
+            document.getElementById('previewName').textContent = this.value || 'الاسم';
+        });
+
+        document.getElementById('ageInput').addEventListener('input', function() {
+            document.getElementById('previewAge').textContent = `🎈 ${this.value || '?'} سنة 🎈`;
+        });
+
+        // Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') generateCard();
+        });
+
+        // تشغيل تلقائي عند التفاعل الأول
+        document.addEventListener('click', function() {
+            if (!isPlaying) toggleSong();
+        }, { once: true });
+    </script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>
